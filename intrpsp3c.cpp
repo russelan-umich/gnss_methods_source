@@ -66,13 +66,40 @@ using namespace NGSdatetime;
 //Constructors
 SP3cFile::SP3cFile()
 {
+    int ir;
+
+    u_matrix = new double* [NUMTERMS];
+    for(ir = 0; ir < NUMTERMS; ir++)
+      u_matrix[ir] = new double[NUMTERMS];
+
+    v_matrix = new double* [NUMTERMS];
+    for(ir = 0; ir < NUMTERMS; ir++)
+      v_matrix[ir] = new double[NUMTERMS];
+
+    cvm_matrix = new double* [NUMTERMS];
+    for(ir = 0; ir < NUMTERMS; ir++)
+      cvm_matrix[ir] = new double[NUMTERMS];
 
 }
 
 // Destructor
 SP3cFile::~SP3cFile()
 {
+    int ir;
+
     fileStream.close();
+
+    for(ir = 0; ir < NUMTERMS; ir++)
+        delete[] cvm_matrix[ir];
+    delete[] cvm_matrix;
+
+    for(ir = 0; ir < NUMTERMS; ir++)
+        delete[] v_matrix[ir];
+    delete[] v_matrix;
+
+    for(ir = 0; ir < NUMTERMS; ir++)
+      delete[] u_matrix[ir];
+    delete[] u_matrix;
 }
 
 
@@ -82,14 +109,15 @@ void SP3cFile::setPathFilenameMode(char *inputFilePath)
 {
   //   fileStream.open("igu14795_18.sp3.sp3",ios_base::in);
   fileStream.open(inputFilePath,std::ios::in);
-  if( ! fileStream )
-    fastgps_printf("Unable to open sp3 file.\n");
+  if( ! fileStream ) {
+    //fastgps_printf("Unable to open sp3 file.\n");
+  }
 }
 
 
 void SP3cFile::initHeaderInfo()
 {
-   int i,ir,j,k;
+   int i,j,k;
 
    formatVersion = ' ';
    modeFlag = ' ';
@@ -126,18 +154,6 @@ void SP3cFile::initHeaderInfo()
      for(j = 0; j < MAXPARAM + 1; j++ )
        for(k = 0; k < MAXSVSEPH + 1; k++ )
             inputValues[i][j][k] = 0.0;
-
-   u_matrix = new double* [NUMTERMS];
-   for(ir = 0; ir < NUMTERMS; ir++)
-     u_matrix[ir] = new double[NUMTERMS];
-
-   v_matrix = new double* [NUMTERMS];
-   for(ir = 0; ir < NUMTERMS; ir++)
-     v_matrix[ir] = new double[NUMTERMS];
-
-   cvm_matrix = new double* [NUMTERMS];
-   for(ir = 0; ir < NUMTERMS; ir++)
-     cvm_matrix[ir] = new double[NUMTERMS];
 }
 
 
@@ -203,13 +219,13 @@ int SP3cFile::readHeader()
           formatVersion != 'b' && formatVersion != 'B' &&
           formatVersion != 'c' && formatVersion != 'C' )
       {
-        fastgps_printf("This program reads only SP3 files with format-mode: aP, bP, or cP ");
+        //fastgps_printf("This program reads only SP3 files with format-mode: aP, bP, or cP ");
         return -1;
       }
       modeFlag = inputRec[2];
       if( modeFlag != 'P' && modeFlag != 'p' )
       {
-        fastgps_printf("This program reads only SP3 files with format-mode: aP, bP, or cP ");
+        //fastgps_printf("This program reads only SP3 files with format-mode: aP, bP, or cP ");
         return -1;
       }
       temp = inputRec.substr( 3, 4 );
@@ -288,8 +304,11 @@ int SP3cFile::readHeader()
         if( atoi( sp3PRNs[indexACC + 1].substr(1,2).c_str() ) > 0 )
         {
           svAccur[indexACC + 1] = (unsigned short) accur;
-          if( accur <= 0 )
-            fastgps_printf("Accuracy warning in SP3 file processing");
+          if( accur <= 0 ) {
+            // This PRN has an accuracy warning.
+            // fastgps_printf("Accuracy warning in SP3 file processing");
+            // return -100; // No reason to fail. Not all PRNs are inaccurate.
+          }
           indexACC++;
         }
       }
@@ -319,7 +338,7 @@ int SP3cFile::readHeader()
 
   if( numberGoodPRNs <= 0  ||  numberSP3svs != numberGoodPRNs )
   {
-    fastgps_printf("Error reading the PRNs from the header for SP3 file");
+    //fastgps_printf("Error reading the PRNs from the header for SP3 file");
     return 1;
   }
   else
@@ -328,7 +347,8 @@ int SP3cFile::readHeader()
 
 //------------------------------------------------------------------------
 
-int SP3cFile::getSVPosVel(DateTime tuser, string PRNid, double rvec[])
+int SP3cFile::getSVPosVel(DateTime tuser, string PRNid, double rvec[],
+                          bool *clkOk = true)
 {
   double    trun;
   double    x_new, x_dot, y_new, y_dot, z_new, z_dot;
@@ -361,7 +381,7 @@ int SP3cFile::getSVPosVel(DateTime tuser, string PRNid, double rvec[])
     return( -2 );
   }
 
-  SVsig = pow(2, (int)svAccur[jsv])/1000.0; // units: meters
+  SVsig = pow(2.0, (int)svAccur[jsv])/1000.0; // units: meters
 
   trun = (tuser - SP3StartTime)*86400.0;  // diff between DateTimes = days
   trun = trun/SP3interval + 1.0;
@@ -488,24 +508,43 @@ int SP3cFile::getSVPosVel(DateTime tuser, string PRNid, double rvec[])
     }
 
     x_chisq = 0.0;
-    svdfit(deltat, xdata, sig, NUMTERMS, x_coef, NUMTERMS,
+    if (!svdfit(deltat, xdata, sig, NUMTERMS, x_coef, NUMTERMS,
            u_matrix, v_matrix, w_array, NUMTERMS, NUMTERMS,
-           &x_chisq, 'P');
+           &x_chisq, 'P'))
+    {
+        // Error calculating Position from SP3 file
+        return -5;
+    }
 
     y_chisq = 0.0;
-    svdfit(deltat, ydata, sig, NUMTERMS, y_coef, NUMTERMS,
+    if (!svdfit(deltat, ydata, sig, NUMTERMS, y_coef, NUMTERMS,
            u_matrix, v_matrix, w_array, NUMTERMS, NUMTERMS,
-           &y_chisq, 'P');
+           &y_chisq, 'P'))
+    {
+        // Error calculating Position from SP3 file
+        return -5;
+    }
 
     z_chisq = 0.0;
-    svdfit(deltat, zdata, sig, NUMTERMS, z_coef, NUMTERMS,
+    if (!svdfit(deltat, zdata, sig, NUMTERMS, z_coef, NUMTERMS,
            u_matrix, v_matrix, w_array, NUMTERMS, NUMTERMS,
-           &z_chisq, 'P');
+           &z_chisq, 'P'))
+    {
+        // Error calculating Position from SP3 file
+        return -5;
+    }
 
     clk_chisq = 0.0;
-    svdfit(deltat, clkdata, sig, 9, clk_coef, 2,
+    *clkOk = true;
+    if (!svdfit(deltat, clkdata, sig, 9, clk_coef, 2,
            u_matrix, v_matrix, w_array, 9, 2,
-           &clk_chisq, 'T');
+           &clk_chisq, 'T'))
+    {
+        // Error calculating Clock from SP3 file
+        // This is not considered a fatal condition just something the user
+        // should be aware of.
+        *clkOk = false;
+    }
 
   } // end of if test for jmax != lastEpochRead && ...
 
@@ -773,12 +812,12 @@ bool SP3cFile::svdfit( double *X, double *Y, double *Sig,
   {
     cerr.setf(ios::fixed);
     cerr.setf(ios::showpoint);
-    fastgps_printf("WARNING: There are data values equal to zero "); 
-    for( k = 0; k < NData; k++)
-    {
-      cerr << k + 1 << " " << setw(20) << setprecision(15) << X[k] << "  "
-        << setw(15) << setprecision(6) << Y[k] << endl;
-    }
+    //fastgps_printf("WARNING: There are data values equal to zero ");
+    //for( k = 0; k < NData; k++)
+    //{
+    //  cerr << k + 1 << " " << setw(20) << setprecision(15) << X[k] << "  "
+    //    << setw(15) << setprecision(6) << Y[k] << endl;
+    //}
     return false;
   }
 
@@ -786,12 +825,12 @@ bool SP3cFile::svdfit( double *X, double *Y, double *Sig,
   {
     cerr.setf(ios::fixed);
     cerr.setf(ios::showpoint);
-    fastgps_printf("WARNING: There are data values equal to 999999 "); 
-    for( k = 0; k < NData; k++)
-    {
-      cerr << k + 1 << " " << setw(20) << setprecision(15) << X[k] << "  "
-        << setw(15) << setprecision(6) << Y[k] << endl;
-    }
+    //fastgps_printf("WARNING: There are data values equal to 999999 ");
+    //for( k = 0; k < NData; k++)
+    //{
+    //  cerr << k + 1 << " " << setw(20) << setprecision(15) << X[k] << "  "
+    //    << setw(15) << setprecision(6) << Y[k] << endl;
+    //}
     return false;
   }
 

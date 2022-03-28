@@ -14,8 +14,8 @@ typedef double gps_real_t;
   typedef unsigned __int32 uint32_t;
   typedef          __int16  int16_t;
   typedef unsigned __int16 uint16_t;
-  typedef          __int8    int8_t;
-  typedef unsigned __int8   uint8_t;
+  typedef signed char        int8_t;
+  typedef unsigned char      uint8_t;
 #endif
 
 

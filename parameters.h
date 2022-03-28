@@ -63,11 +63,16 @@
 #define HAVE_TOW        1
 #define HAVE_EPH        2
 #define HAVE_EXTERNAL_EPH        1
-#define PVT_INTERVAL    0.02     // seconds
+#define XPVT_INTERVAL    0.2     // seconds
 #define NO_LOGGING      0
 #define NORMAL_LOGGING  1
 #define DEBUG_LOGGING   2
 #define GOOGLE_LOGGING  3
+
+#define HAVE_TIME_FILE__ESTIMATE 1
+#define HAVE_WGS84_FILE_ESTIMATE 1
+#define HAVE_DOPPLER_POS_ESTIMATE 2
+#define HAVE_SNAPSHOT_POS_ESTIMATE 3
 
 //#define MAX_CHANNELS 1
 #define MAX_CHANNELS 12
@@ -89,6 +94,7 @@
 #define CARRIER_AID_SF (CODE_FREQ / CARRIER_FREQ)
 
 #define ACQ_MS        4
+//#define ACQ_MS        8 //Nick:Original above
 #define COARSE_ACQ_THRESH    25
 #define COARSE_ACQ_ADJPEAK  (DOPPLER_RADIUS / NUM_COARSE_DOPPLERS)
 
@@ -110,7 +116,7 @@
 
 // for the first half second, very high BW/Gain to pull the freq in fast
 #define KCA2_FLL2_DEFAULT	1.15	// with normalization, BW 50
-// for the next half second, drop the loopbandwidth to better determine the freq before jump to PLL 
+// for the next half second, drop the loopbandwidth to better determine the freq before jump to PLL
 #define KCA2_FLL1_DEFAULT	0.10	// with normalization, BW 15
 
 #define KCA2_PLL_DEFAULT	0.10	// with normalization, BW 15
@@ -120,8 +126,8 @@
 #define TL_FLL_SWITCH_TIME 500
 #define TL_PLL_TIME 1000
 // must be greater than TL_PLL_TIME
-// in the interval between TL_PLL_TIME and TL_PULLIN_TIME the data for detecting the nav bit edge is gathered 
-#define TL_PULLIN_TIME 1500		
+// in the interval between TL_PLL_TIME and TL_PULLIN_TIME the data for detecting the nav bit edge is gathered
+#define TL_PULLIN_TIME 1500
 
 #define MAX(a,b) (a >= b ? a : b)
 

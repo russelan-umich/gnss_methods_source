@@ -161,7 +161,8 @@ class SP3cFile
 
       //Selectors
       int readHeader();
-      int getSVPosVel(DateTime tuser, string PRNid, double rvec[]);
+      int getSVPosVel(DateTime tuser, string PRNid, double rvec[],
+                      bool *clkOk = true);
 
       char getFormatVersion();
       char getModeFlag();

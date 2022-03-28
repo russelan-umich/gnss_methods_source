@@ -32,22 +32,27 @@
 #define FASTGPS_H
 
 #define _CRT_SECURE_NO_DEPRECATE
-#define _USE_MATH_DEFINES
+#ifndef _USE_MATH_DEFINES
+    #define _USE_MATH_DEFINES
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 
-#include "parameters.h"
-#include "structs.h"
-#include "funcs.h"
-#include "globals.h"
+//#include "parameters.h"
+//#include "dopp_pos.h"
+//#include "snap_shot.h"
+//#include "structs.h"
+//#include "funcs.h"
+//#include "globals.h"
 #include "datetime.h"
 #include "intrpsp3c.h"
 
-#define VERIFY_IO(STMT, VAL) { if ((STMT)!= (VAL)) ; }
+// this function is implemented differently in the CLI, GUI, and MSVC versions
+//void fastgps_printf(const char *format, ...);
+#define fastgps_printf printf
 
-// this function is implemented differently in the CLI and GUI versions
-void fastgps_printf(const char *format, ...);
+#define VERIFY_IO(STMT, VAL) { if ((STMT)!= (VAL)) { fastgps_printf("i/o error at %d in %s\n", __LINE__, __FILE__); } }
 
 #endif
 
