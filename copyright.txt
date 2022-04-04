@@ -1,7 +1,20 @@
-CYGNSS E2ES is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+intrpSP3c:
+These files were generate by Steve Hill from National Geodetic Survey, NOAA
 
-CYGNSS E2ES is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+THIS PROGRAM AND SUPPORTING INFORMATION IS FURNISHED BY THE GOVERNMENT OF THE UNITED STATES OF AMERICA, AND IS ACCEPTED AND USED BY THE RECIPIENT WITH THE UNDERSTANDING THAT THE UNITED STATES GOVERNMENT MAKES NO WARRANTIES, EXPRESS OR IMPLIED, CONCERNING THE ACCURACY, COMPLETENESS, RELIABILITY, OR SUITABILITY OF THIS PROGRAM, OF ITS CONSTITUENT PARTS, OR OF ANY SUPPORTING DATA. THE GOVERNMENT OF THE UNITED STATES OF AMERICA SHALL BE UNDER NO LIABILITY WHATSOEVER RESULTING FROM ANY USE OF THIS PROGRAM.  THIS PROGRAM SHOULD NOT BE RELIED UPON AS THE SOLE BASIS FOR SOLVING A PROBLEM WHOSE INCORRECT SOLUTION COULD RESULT IN INJURY TO PERSON OR PROPERTY.  THIS PROGRAM IS PROPERTY OF THE GOVERNMENT OF THE UNITED STATES OF AMERICA.  THEREFORE, THE RECIPIENT FURTHER AGREES NOT TO ASSERT PROPRIETARY RIGHTS THEREIN AND NOT TO REPRESENT THIS PROGRAM TO ANYONE AS BEING OTHER THAN A GOVERNMENT PROGRAM.                   
 
-You should have received a copy of the GNU General Public License along with CYGNSS E2ES.  If not, see <http://www.gnu.org/licenses/>.
+This file is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 2 of the License, or (at your option) any later version.                                  
+Fastgps is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details. 
 
-These files were originally generated for the CYGNSS E2ES by Andrew O'Brien, Scott Gleason, Aaron Ridley, and Derek Posselt and further modifications have been made for the CYGNSS L1 code by Andrew O'Brien
+
+All other files:
+These files were originally created for the GNSS Applications and Method book by Scott Gleason, Morgan Quigley, Pieter Abbeel, Mark Borgerding, Kim Chang, and Nicholas Othieno.
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+* Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+* Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+* Neither the authors' names nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+
+
+
+Further modifications were made to the files by Tim Butler and Steve Musko.
